@@ -1,0 +1,21 @@
+#actionset {
+	width: 100%;
+	height: 20vh;
+	background-color: red;
+	display: table;
+}
+
+.action {
+	box-sizing: border-box;
+	display: table-cell;
+	width: auto;
+	border: 1vh solid white;
+	height: 100%;
+	background-color: black;
+	color: white;
+}
+
+.action.cursored {
+	background-color: white;
+	color: black;
+}
