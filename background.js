@@ -1,4 +1,4 @@
-var fired = false;
+/*var fired = false;
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 	if(!fired && changeInfo.status == "complete") {
 		fired = true;
@@ -8,4 +8,4 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 			});
 		});
 	}
-});
+});*/
