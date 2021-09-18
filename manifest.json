@@ -1,22 +1,27 @@
 {
-	"manifest_version": 3,
+	"manifest_version": 2,
+
 	"name": "AB",
+	"author": "Thomas Kaldahl, Elizabeth Sims, and David Zhao",
+	"description": "An accessibility interface for navigation in websites like YouTube.",
 	"version": "0.0.0",
 	
-	"action": {},
-	"defualt_locale": "en",
-	"description": "An accessibility interface for navigation in websites like YouTube.",
 	"icons": {},
 
-	"author": "Thomas Kaldahl, Elizabeth Sims, and David Zhao",
 	"background": {
-		"service_worker": "background.js"
+		"scripts": ["background.js"]
 	},
 	"content_scripts": [{
 		"matches": [
-			"*://youtube.com*"
+			"<all_urls>"
 		],
 		"js": ["content.js"]
 	}],
-	"permissions": "activeTab"
+
+	"permissions": [
+		"activeTab",
+		"webNavigation",
+		"tabs",
+		"*://*/*"
+	]
 }
