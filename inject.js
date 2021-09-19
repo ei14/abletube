@@ -59,8 +59,8 @@ var rootactionset = {
 									commands: [["actionset", {
 										cursor: false,
 										actions: [
-											{title: "-10%", commands: ["volumeup", -10]},
-											{title: "Exit", commands: ["reset"]},
+											{title: "-10%", commands: [["volumeup", -10]]},
+											{title: "Exit", commands: [["reset"]]},
 										],
 										responses: [["select", 0], ["select", 1]]
 									}]]
@@ -70,8 +70,8 @@ var rootactionset = {
 									commands: [[ "actionset", {
 										cursor: false,
 										actions: [
-											{title: "+10%", commands: ["volumeup", 10]},
-											{title: "Exit", commands: ["reset"]},
+											{title: "+10%", commands: [["volumeup", 10]]},
+											{title: "Exit", commands: [["reset"]]},
 										],
 										responses: [["select", 0], ["select", 1]]
 									}]]
