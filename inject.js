@@ -144,10 +144,14 @@ var homeactionset = {
 };
 
 var buttonset;
-buttonset = document.createElement("div");
-buttonset.id = "actionset";
-const pageContent = document.getElementById("primary");
-pageContent.insertBefore(buttonset, pageContent.firstChild);
+setTimeout(() => {
+	buttonset = document.createElement("div");
+	buttonset.id = "actionset";
+	const pageContent = document.getElementById("primary");
+	pageContent.insertBefore(buttonset, pageContent.firstChild);
+
+	execCommand(["reset"]);
+}, 100);
 
 setInterval(() => {
 	const player = document.getElementById("ytd-player").player_;
@@ -162,6 +166,9 @@ setInterval(() => {
 		}
 	}
 	if(document.getElementById("chips-wrapper")) document.getElementById("chips-wrapper").remove();
+
+	console.log(localStorage.getItem("at-keybinds"));
+	keys = localStorage.getItem("at-keybinds").split(',');
 }, 1000);
 
 var cursor = 0;
@@ -311,4 +318,3 @@ window.addEventListener("keydown", (e) => {
 	}
 });
 
-execCommand(["reset"]);
