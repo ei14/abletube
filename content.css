@@ -1,6 +1,6 @@
 #actionset {
 	width: 100%;
-	height: 20vh;
+	max-height: 40vh;
 	background-color: red;
 	display: table;
 }
@@ -11,8 +11,16 @@
 	width: auto;
 	border: 1vh solid white;
 	height: 100%;
+	padding: 2vh;
+
 	background-color: black;
 	color: white;
+
+	font-size: 5vh;
+	font-family: "Roboto", sans-serif;
+	text-align: center;
+
+	overflow: hidden;
 }
 
 .action.cursored {

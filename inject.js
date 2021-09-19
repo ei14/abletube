@@ -7,9 +7,9 @@ Actionsets have 3 properties:
 Actions have 2 properties:
 	title, string - The title to be shown to the user
 		special values are enclosed in curly braces
-			{REC#}
+			{R#}
 				Replaces the title with the title of the #th reccomended video
-			{THIS}
+			{T}
 				Replaces the title with the title of the current video
 	commands, array - A list of Commands to be executed upon selection of the action
 Commands are arrays with at least 1 element:
@@ -30,7 +30,9 @@ List of commands:
 
 */
 
-const rootactionset = {
+var keys = ["KeyQ", "KeyW"];
+
+var rootactionset = {
 	cursor: false,
 	actions: [
 		{
@@ -81,9 +83,9 @@ const rootactionset = {
 			commands: [["actionset", {
 				cursor: true,
 				actions: [
-					{title: "{REC0}", commands: [["nextvideo", 0]]},
-					{title: "{REC1}", commands: [["nextvideo", 1]]},
-					{title: "{REC2}", commands: [["nextvideo", 2]]},
+					{title: "{R0}", commands: [["nextvideo", 0]]},
+					{title: "{R1}", commands: [["nextvideo", 1]]},
+					{title: "{R2}", commands: [["nextvideo", 2]]},
 					{title: "Cancel", commands: [["reset"]]},
 				],
 				responses: [["select", 0], ["move", 1]]
@@ -94,7 +96,6 @@ const rootactionset = {
 };
 
 setInterval(() => {
-	console.log("HI");
 	const player = document.getElementById("ytd-player").player_;
 	if(player) {
 		const skipAd = document.getElementsByClassName("ytp-ad-skip-button");
@@ -110,6 +111,21 @@ setInterval(() => {
 
 var cursor = 0;
 var displayCursor = false;
+var currentactionset = rootactionset;
+
+buttonset = document.createElement("div");
+buttonset.id = "actionset";
+
+buttonOne = document.createElement("div");
+buttonOne.classList.add("action");
+buttonset.appendChild(buttonOne);
+
+buttonTwo = document.createElement("div");
+buttonTwo.classList.add("action");
+buttonset.appendChild(buttonTwo);
+
+const pageContent = document.getElementById("primary");
+pageContent.insertBefore(buttonset, pageContent.firstChild);
 
 const clamp = (a, x, b) => {
 	// Returns x clamped between a and b
@@ -118,8 +134,45 @@ const clamp = (a, x, b) => {
 	return x;
 }
 
+const parseTitle = (str) => {
+	let title = str;
+	while(title.includes("{") && title.indexOf("{") < title.indexOf("}")) {
+		let openbrace = title.indexOf("{");
+		let closebrace = title.indexOf("}");
+		let macro = title.slice(openbrace + 1, closebrace);
+		switch(macro.charAt(0)) {
+			case 'R':
+				title =
+					title.slice(0, openbrace)
+					+ document.querySelectorAll("[id='video-title']")[parseInt(macro.slice(1))].innerHTML.trim()
+					+ title.slice(closebrace + 1);
+			case 'T':
+				// TODO: get current title
+				break;
+		}
+	}
+	return title;
+};
+
+const createButton = (action) => {
+	let button = document.createElement("div");
+	button.classList.add("action");
+	button.innerHTML = parseTitle(action.title);
+	return button;
+};
+
 const loadActionSet = (set) => {
-	// TODO
+	while(buttonset.firstChild) {
+		buttonset.removeChild(buttonset.firstChild);
+	}
+	set.actions.forEach(action => {
+		buttonset.appendChild(createButton(action));
+	});
+	if(set.cursor) {
+		buttonset.firstChild.classList.add("cursored");
+	}
+	currentactionset = set;
+	cursor = 0;
 }
 
 const execCommand = (args) => {
@@ -171,37 +224,29 @@ const execCommand = (args) => {
 	}
 }
 
-console.log("INIT");
-buttonset = document.createElement("div");
-buttonset.id = "actionset";
-
-buttonOne = document.createElement("div");
-buttonOne.classList.add("action");
-buttonset.appendChild(buttonOne);
-
-buttonTwo = document.createElement("div");
-buttonTwo.classList.add("action");
-buttonset.appendChild(buttonTwo);
-
-const pageContent = document.getElementById("primary");
-pageContent.insertBefore(buttonset, pageContent.firstChild);
-console.log("FIN");
+const execResponse = (args) => {
+	switch(args[0]) {
+		case "select":
+			currentactionset.actions[cursor + args[1]].commands.forEach(command => {
+				execCommand(command);
+			});
+			break;
+		case "move":
+			const buttons = buttonset.getElementsByClassName("action");
+			buttons[cursor].classList.remove("cursored");
+			cursor = (cursor + args[1]) % buttons.length;
+			buttons[cursor].classList.add("cursored");
+			break;
+	}
+}
 
 window.addEventListener("keydown", (e) => {
-	const player = document.getElementById("ytd-player").player_;
-	const upnext = document.getElementsByClassName("ytd-thumbnail")[0];
-
-	if(e.code == "KeyQ") {
-		if(player.getPlayerState() == 1) { // Playing
-			execCommand(["playpause", 0]);
-			execCommand(["fullscreen", 0]);
-		} else if(player.getPlayerState() == 2) { // Paused
-			execCommand(["playpause", 1]);
-			execCommand(["fullscreen", 1]);
+	for(let i = 0; i < keys.length; i++) {
+		if(e.code == keys[i]) {
+			execResponse(currentactionset.responses[i]);
+			break;
 		}
-	}
-	if(e.code == "KeyW") {
-		upnext.click();
 	}
 });
 
+loadActionSet(rootactionset);
