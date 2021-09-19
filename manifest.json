@@ -5,7 +5,7 @@
 	"author": "Thomas Kaldahl, Elizabeth Sims, and David Zhao",
 	"description": "An accessibility interface for navigation in websites like YouTube.",
 	"version": "0.0.0",
-	
+
 	"icons": {},
 
 	"background": {
@@ -19,6 +19,9 @@
 		"css": ["content.css"],
 		"js": ["content.js"]
 	}],
+	"browser_action": {
+		"default_popup": "popup.html"
+	},
 
 	"permissions": [
 		"activeTab",
