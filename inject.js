@@ -267,15 +267,15 @@ const execCommand = (args) => {
 			player.setVolume(clamp(0, player.getVolume() + args[1], 100));
 			break;
 		case "reccomended":
-			const reccvids = document.getElementsByClassName("ytd-thumbnail");
-			reccvids[args[1]].click();
+			const reccvids = document.querySelectorAll("ytd-thumbnail");
+			window.location.href = reccvids[args[1]].querySelector("a").href;
 			break;
 		case "goto":
 			window.location.href = args[1];
 			break;
 		case "refresh":
 			setTimeout(() => {
-				window.location.reload();
+				//window.location.reload();
 			}, 1);
 			break;
 	}
