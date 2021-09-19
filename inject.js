@@ -23,9 +23,9 @@ List of commands:
 	select(offset) - Executes the command at offset "offset" from the cursor in the currently loaded Actionset
 	move(distance) - Moves the cursor by distance "distance"
 
-	playvideo() - Plays or pauses the video
+	playpause() - Plays or pauses the video
 	fullscreen() - Toggles fullscreen
-	nextvideo(video) - Goes to the "video"th next video in reccomended
+	reccomended(video) - Goes to the "video"th next video in reccomended
 	volumeup(amount) - Changes the volume by "amount" (set negative to lower volume)
 
 */
@@ -40,30 +40,37 @@ var rootactionset = {
 			commands: [["actionset", {
 				cursor: true,
 				actions: [
-					{title: "Play / Pause", commands: [["playvideo"], ["fullscreen"]]},
-					{title: "Next video", commands: [["nextvideo", 0]]},
+					{title: "Play / Pause", commands: [["playpause", -1], ["reset"]]},
+					{title: "Fullscreen", commands: [
+						["fullscreen", 1],
+						["actionset", {
+							cursor: false,
+							actions: [{title: "Exit Fullscreen", commands: [["fullscreen", 0], ["reset"]]}],
+							responses: [["select", 0], ["select", 0]]
+						}]
+					]},
 					{
 						title: "Change volume",
 						commands: [["actionset", {
 							cursor: false,
 							actions: [
 								{
-									title: "Increase volume",
-									commands: [[ "actionset", {
+									title: "Decrease volume",
+									commands: [["actionset", {
 										cursor: false,
 										actions: [
-											{title: "+10%", commands: ["volumeup", 5]},
+											{title: "-10%", commands: ["volumeup", -10]},
 											{title: "Exit", commands: ["reset"]},
 										],
 										responses: [["select", 0], ["select", 1]]
 									}]]
 								},
 								{
-									title: "Decrease volume",
-									commands: [["actionset", {
+									title: "Increase volume",
+									commands: [[ "actionset", {
 										cursor: false,
 										actions: [
-											{title: "-10%", commands: ["volumeup", -5]},
+											{title: "+10%", commands: ["volumeup", 10]},
 											{title: "Exit", commands: ["reset"]},
 										],
 										responses: [["select", 0], ["select", 1]]
@@ -83,9 +90,9 @@ var rootactionset = {
 			commands: [["actionset", {
 				cursor: true,
 				actions: [
-					{title: "{R0}", commands: [["nextvideo", 0]]},
-					{title: "{R1}", commands: [["nextvideo", 1]]},
-					{title: "{R2}", commands: [["nextvideo", 2]]},
+					{title: "{R0}", commands: [["reccomended", 0], ["reset"]]},
+					{title: "{R1}", commands: [["reccomended", 1], ["reset"]]},
+					{title: "{R2}", commands: [["reccomended", 2], ["reset"]]},
 					{title: "Cancel", commands: [["reset"]]},
 				],
 				responses: [["select", 0], ["move", 1]]
@@ -107,7 +114,7 @@ setInterval(() => {
 			closeOverlay[0].click();
 		}
 	}
-}, 3000);
+}, 1000);
 
 var cursor = 0;
 var displayCursor = false;
@@ -175,6 +182,8 @@ const loadActionSet = (set) => {
 	cursor = 0;
 }
 
+var initialInputs = false;
+
 const execCommand = (args) => {
 	const player = document.getElementById("ytd-player").player_;
 	switch(args[0]) {
@@ -241,6 +250,11 @@ const execResponse = (args) => {
 }
 
 window.addEventListener("keydown", (e) => {
+	if(!initialInputs) {
+		initialInputs = true;
+		//execCommand(["fullscreen", 1]);
+		//console.log("INIT");
+	}
 	for(let i = 0; i < keys.length; i++) {
 		if(e.code == keys[i]) {
 			execResponse(currentactionset.responses[i]);
