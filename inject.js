@@ -1,3 +1,5 @@
+var keys = ["KeyQ", "KeyW"];
+
 /*
 
 Actionsets have 3 properties:
@@ -29,8 +31,6 @@ List of commands:
 	volumeup(amount) - Changes the volume by "amount" (set negative to lower volume)
 
 */
-
-var keys = ["KeyQ", "KeyW"];
 
 var rootactionset = {
 	cursor: false,
@@ -86,13 +86,23 @@ var rootactionset = {
 			}]]
 		},
 		{
-			title: "Select new video",
+			title: "Go to",
 			commands: [["actionset", {
 				cursor: true,
 				actions: [
-					{title: "{R0}", commands: [["reccomended", 0], ["reset"]]},
-					{title: "{R1}", commands: [["reccomended", 1], ["reset"]]},
-					{title: "{R2}", commands: [["reccomended", 2], ["reset"]]},
+					{title: "Home screen", commands: [["goto", "https://youtube.com"]]},
+					{title: "Subscriptions", commands: [["goto", "https://youtube.com/feed/subscriptions"]]},
+					{title: "Reccomended videos", commands: [["actionset", {
+						cursor: true,
+						actions: [
+							{title: "{R0}", commands: [["reccomended", 0], ["reset"]]},
+							{title: "{R1}", commands: [["reccomended", 1], ["reset"]]},
+							{title: "{R2}", commands: [["reccomended", 2], ["reset"]]},
+							{title: "{R3}", commands: [["reccomended", 3], ["reset"]]},
+							{title: "Cancel", commands: [["reset"]]},
+						],
+						responses: [["select", 0], ["move", 1]]
+					}]]},
 					{title: "Cancel", commands: [["reset"]]},
 				],
 				responses: [["select", 0], ["move", 1]]
@@ -101,6 +111,43 @@ var rootactionset = {
 	],
 	responses: [["select", 0], ["select", 1]]
 };
+var homeactionset = {
+	cursor: true,
+	actions: [
+		{title: "{R0}", commands: [["reccomended", 0], ["actionset", rootactionset], ["refresh"]]},
+		{title: "{R1}", commands: [["reccomended", 1], ["actionset", rootactionset], ["refresh"]]},
+		{title: "{R2}", commands: [["reccomended", 2], ["actionset", rootactionset], ["refresh"]]},
+		{title: "{R3}", commands: [["reccomended", 3], ["actionset", rootactionset], ["refresh"]]},
+		{title: "Next page", commands: [["actionset", {
+			cursor: true,
+			actions: [
+				{title: "{R4}", commands: [["reccomended", 4], ["actionset", rootactionset], ["refresh"]]},
+				{title: "{R5}", commands: [["reccomended", 5], ["actionset", rootactionset], ["refresh"]]},
+				{title: "{R6}", commands: [["reccomended", 6], ["actionset", rootactionset], ["refresh"]]},
+				{title: "{R7}", commands: [["reccomended", 7], ["actionset", rootactionset], ["refresh"]]},
+				{title: "Next page", commands: [["actionset", {
+					cursor: true,
+					actions: [
+						{title: "{R8}", commands: [["reccomended", 8], ["actionset", rootactionset], ["refresh"]]},
+						{title: "{R9}", commands: [["reccomended", 9], ["actionset", rootactionset], ["refresh"]]},
+						{title: "{R10}", commands: [["reccomended", 10], ["actionset", rootactionset], ["refresh"]]},
+						{title: "{R11}", commands: [["reccomended", 11], ["actionset", rootactionset], ["refresh"]]},
+						{title: "First page", commands: [["reset"]]},
+					],
+					responses: [["select", 0], ["move", 1]]
+				}]]},
+			],
+			responses: [["select", 0], ["move", 1]]
+		}]]},
+	],
+	responses: [["select", 0], ["move", 1]]
+};
+
+var buttonset;
+buttonset = document.createElement("div");
+buttonset.id = "actionset";
+const pageContent = document.getElementById("primary");
+pageContent.insertBefore(buttonset, pageContent.firstChild);
 
 setInterval(() => {
 	const player = document.getElementById("ytd-player").player_;
@@ -114,25 +161,12 @@ setInterval(() => {
 			closeOverlay[0].click();
 		}
 	}
+	if(document.getElementById("chips-wrapper")) document.getElementById("chips-wrapper").remove();
 }, 1000);
 
 var cursor = 0;
 var displayCursor = false;
 var currentactionset = rootactionset;
-
-buttonset = document.createElement("div");
-buttonset.id = "actionset";
-
-buttonOne = document.createElement("div");
-buttonOne.classList.add("action");
-buttonset.appendChild(buttonOne);
-
-buttonTwo = document.createElement("div");
-buttonTwo.classList.add("action");
-buttonset.appendChild(buttonTwo);
-
-const pageContent = document.getElementById("primary");
-pageContent.insertBefore(buttonset, pageContent.firstChild);
 
 const clamp = (a, x, b) => {
 	// Returns x clamped between a and b
@@ -152,10 +186,7 @@ const parseTitle = (str) => {
 				title =
 					title.slice(0, openbrace)
 					+ document.querySelectorAll("[id='video-title']")[parseInt(macro.slice(1))].innerHTML.trim()
-					+ title.slice(closebrace + 1);
-			case 'T':
-				// TODO: get current title
-				break;
+					+ title.slice(closebrace + 1); case 'T': // TODO: get current title break;
 		}
 	}
 	return title;
@@ -185,13 +216,22 @@ const loadActionSet = (set) => {
 var initialInputs = false;
 
 const execCommand = (args) => {
-	const player = document.getElementById("ytd-player").player_;
+	var player;
+	if(document.getElementById("ytd-player")) {
+		player = document.getElementById("ytd-player").player_;
+	}
 	switch(args[0]) {
 		case "actionset":
 			loadActionSet(args[1]);
 			break;
 		case "reset":
-			loadActionSet(rootactionset);
+			if(window.location.href.split("com")[1].includes("feed/subscriptions")) {
+				loadActionSet(homeactionset);
+			} else if(window.location.href.split("com")[1].length > 1) {
+				loadActionSet(rootactionset);
+			} else {
+				loadActionSet(homeactionset);
+			}
 			break;
 		case "playpause":
 			switch(args[1]) {
@@ -230,6 +270,14 @@ const execCommand = (args) => {
 			const reccvids = document.getElementsByClassName("ytd-thumbnail");
 			reccvids[args[1]].click();
 			break;
+		case "goto":
+			window.location.href = args[1];
+			break;
+		case "refresh":
+			setTimeout(() => {
+				window.location.reload();
+			}, 1);
+			break;
 	}
 }
 
@@ -263,4 +311,4 @@ window.addEventListener("keydown", (e) => {
 	}
 });
 
-loadActionSet(rootactionset);
+execCommand(["reset"]);
