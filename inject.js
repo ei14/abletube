@@ -10,7 +10,7 @@ Actions have 2 properties:
 	title, string - The title to be shown to the user
 		special values are enclosed in curly braces
 			{R#}
-				Replaces the title with the title of the #th reccomended video
+				Replaces the title with the title of the #th recommended video
 			{T}
 				Replaces the title with the title of the current video
 	commands, array - A list of Commands to be executed upon selection of the action
@@ -27,7 +27,7 @@ List of commands:
 
 	playpause() - Plays or pauses the video
 	fullscreen() - Toggles fullscreen
-	reccomended(video) - Goes to the "video"th next video in reccomended
+	recommended(video) - Goes to the "video"th next video in recommended
 	volumeup(amount) - Changes the volume by "amount" (set negative to lower volume)
 
 */
@@ -92,13 +92,13 @@ var rootactionset = {
 				actions: [
 					{title: "Home screen", commands: [["goto", "https://youtube.com"]]},
 					{title: "Subscriptions", commands: [["goto", "https://youtube.com/feed/subscriptions"]]},
-					{title: "Reccomended videos", commands: [["actionset", {
+					{title: "Recommended videos", commands: [["actionset", {
 						cursor: true,
 						actions: [
-							{title: "{R0}", commands: [["reccomended", 0], ["reset"]]},
-							{title: "{R1}", commands: [["reccomended", 1], ["reset"]]},
-							{title: "{R2}", commands: [["reccomended", 2], ["reset"]]},
-							{title: "{R3}", commands: [["reccomended", 3], ["reset"]]},
+							{title: "{R0}", commands: [["recommended", 0], ["reset"]]},
+							{title: "{R1}", commands: [["recommended", 1], ["reset"]]},
+							{title: "{R2}", commands: [["recommended", 2], ["reset"]]},
+							{title: "{R3}", commands: [["recommended", 3], ["reset"]]},
 							{title: "Cancel", commands: [["reset"]]},
 						],
 						responses: [["select", 0], ["move", 1]]
@@ -114,24 +114,24 @@ var rootactionset = {
 var homeactionset = {
 	cursor: true,
 	actions: [
-		{title: "{R0}", commands: [["reccomended", 0], ["actionset", rootactionset], ["refresh"]]},
-		{title: "{R1}", commands: [["reccomended", 1], ["actionset", rootactionset], ["refresh"]]},
-		{title: "{R2}", commands: [["reccomended", 2], ["actionset", rootactionset], ["refresh"]]},
-		{title: "{R3}", commands: [["reccomended", 3], ["actionset", rootactionset], ["refresh"]]},
+		{title: "{R0}", commands: [["recommended", 0], ["actionset", rootactionset], ["refresh"]]},
+		{title: "{R1}", commands: [["recommended", 1], ["actionset", rootactionset], ["refresh"]]},
+		{title: "{R2}", commands: [["recommended", 2], ["actionset", rootactionset], ["refresh"]]},
+		{title: "{R3}", commands: [["recommended", 3], ["actionset", rootactionset], ["refresh"]]},
 		{title: "Next page", commands: [["actionset", {
 			cursor: true,
 			actions: [
-				{title: "{R4}", commands: [["reccomended", 4], ["actionset", rootactionset], ["refresh"]]},
-				{title: "{R5}", commands: [["reccomended", 5], ["actionset", rootactionset], ["refresh"]]},
-				{title: "{R6}", commands: [["reccomended", 6], ["actionset", rootactionset], ["refresh"]]},
-				{title: "{R7}", commands: [["reccomended", 7], ["actionset", rootactionset], ["refresh"]]},
+				{title: "{R4}", commands: [["recommended", 4], ["actionset", rootactionset], ["refresh"]]},
+				{title: "{R5}", commands: [["recommended", 5], ["actionset", rootactionset], ["refresh"]]},
+				{title: "{R6}", commands: [["recommended", 6], ["actionset", rootactionset], ["refresh"]]},
+				{title: "{R7}", commands: [["recommended", 7], ["actionset", rootactionset], ["refresh"]]},
 				{title: "Next page", commands: [["actionset", {
 					cursor: true,
 					actions: [
-						{title: "{R8}", commands: [["reccomended", 8], ["actionset", rootactionset], ["refresh"]]},
-						{title: "{R9}", commands: [["reccomended", 9], ["actionset", rootactionset], ["refresh"]]},
-						{title: "{R10}", commands: [["reccomended", 10], ["actionset", rootactionset], ["refresh"]]},
-						{title: "{R11}", commands: [["reccomended", 11], ["actionset", rootactionset], ["refresh"]]},
+						{title: "{R8}", commands: [["recommended", 8], ["actionset", rootactionset], ["refresh"]]},
+						{title: "{R9}", commands: [["recommended", 9], ["actionset", rootactionset], ["refresh"]]},
+						{title: "{R10}", commands: [["recommended", 10], ["actionset", rootactionset], ["refresh"]]},
+						{title: "{R11}", commands: [["recommended", 11], ["actionset", rootactionset], ["refresh"]]},
 						{title: "First page", commands: [["reset"]]},
 					],
 					responses: [["select", 0], ["move", 1]]
@@ -273,7 +273,7 @@ const execCommand = (args) => {
 		case "volumeup":
 			player.setVolume(clamp(0, player.getVolume() + args[1], 100));
 			break;
-		case "reccomended":
+		case "recommended":
 			const reccvids = document.querySelectorAll("ytd-thumbnail");
 			window.location.href = reccvids[args[1]].querySelector("a").href;
 			break;
